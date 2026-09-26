@@ -1,0 +1,61 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ambient-demo
+  region: eu-west-1
+  version: "1.36"
+  tags:
+    project: ambient-demo
+
+# 3 AZs -> 3 public + 3 private subnets
+availabilityZones: [eu-west-1a, eu-west-1b, eu-west-1c]
+
+vpc:
+  cidr: 10.20.0.0/16
+  nat:
+    gateway: Single               # Single | HighlyAvailable
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true           # nodes talk to the API server inside the VPC
+  publicAccessCIDRs:              # ONLY these IPs can reach the public API endpoint
+    - "27.34.65.32/32"
+    # - "REPLACE_WITH_IP_2/32"
+
+iam:
+  withOIDC: true
+
+accessConfig:
+  authenticationMode: API
+  bootstrapClusterCreatorAdminPermissions: true
+
+addons:
+  - name: vpc-cni
+    version: latest
+    configurationValues: |-
+      env:
+        ENABLE_PREFIX_DELEGATION: "true"
+        WARM_PREFIX_TARGET: "1"
+        POD_SECURITY_GROUP_ENFORCING_MODE: "standard"
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+  - name: eks-pod-identity-agent
+    version: latest
+
+managedNodeGroups:
+  - name: ng-default
+    instanceType: t3.medium
+    amiFamily: Bottlerocket
+    desiredCapacity: 3
+    minSize: 3
+    maxSize: 5
+    volumeSize: 40                # Bottlerocket data volume
+    privateNetworking: true       # nodes in private subnets only
+    labels:
+      role: general
+    bottlerocket:
+      settings:
+        kubernetes:
+          max-pods: 110           # pairs with prefix delegation
