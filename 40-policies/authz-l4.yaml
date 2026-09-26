@@ -1,0 +1,39 @@
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: strict-mtls
+  namespace: app
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-namespace-and-ingress
+  namespace: app
+spec:
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            namespaces: ["app"]
+        - source:
+            principals:
+              - cluster.local/ns/istio-ingress/sa/public-gateway-istio
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: redis-only-from-cartservice
+  namespace: app
+spec:
+  selector:
+    matchLabels:
+      app: redis-cart
+  action: DENY
+  rules:
+    - from:
+        - source:
+            notPrincipals:
+              - cluster.local/ns/app/sa/cartservice

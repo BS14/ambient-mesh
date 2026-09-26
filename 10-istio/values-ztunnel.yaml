@@ -1,0 +1,13 @@
+profile: ambient
+global:
+  hub: docker.io/istio
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:                     # ztunnel owns all L4 data-plane traffic per node — cap explicitly
+    cpu: 500m
+    memory: 1Gi
+
+logLevel: info                # explicit; easy to flip to "debug" for article troubleshooting section

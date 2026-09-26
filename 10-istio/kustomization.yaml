@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+helmCharts:
+  - name: istiod
+    repo: https://blob.istio.io/istio-release/charts
+    version: 1.31.1
+    releaseName: istiod
+    namespace: istio-system
+    kubeVersion: "1.36.0"
+    valuesFile: values-istiod.yaml
+
+  - name: cni
+    repo: https://blob.istio.io/istio-release/charts
+    version: 1.31.1
+    releaseName: istio-cni
+    namespace: istio-system
+    kubeVersion: "1.36.0"
+    valuesFile: values-cni.yaml
+
+  - name: ztunnel
+    repo: https://blob.istio.io/istio-release/charts
+    version: 1.31.1
+    releaseName: ztunnel
+    namespace: istio-system
+    kubeVersion: "1.36.0"
+    valuesFile: values-ztunnel.yaml

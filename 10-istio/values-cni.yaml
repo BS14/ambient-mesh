@@ -1,0 +1,16 @@
+profile: ambient
+global:
+  hub: docker.io/istio
+
+ambient:
+  dnsCapture: true          # already the chart default once ambient is on; explicit for article readers
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:                   # chart ships requests only — bound worst case on t3.medium nodes
+    cpu: 200m
+    memory: 200Mi
+
+terminationGracePeriodSeconds: 60   # headroom for CNI cleanup during rollouts (upstream chart comment)

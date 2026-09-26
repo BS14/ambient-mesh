@@ -1,0 +1,22 @@
+profile: ambient
+global:
+  hub: docker.io/istio
+  defaultPodDisruptionBudget:
+    enabled: false             # single replica — avoid PDB blocking EKS node drains/AZ rebalancing
+
+base:
+  validationFailurePolicy: Fail
+
+meshConfig:
+  accessLogFile: /dev/stdout
+
+pilot:
+  autoscaleEnabled: false     # single demo replica by design — no HA/autoscaling
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:                    # chart default request alone is 500m/2Gi; cap since we've downsized
+      cpu: 1000m
+      memory: 1Gi

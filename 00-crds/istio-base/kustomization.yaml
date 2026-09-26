@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+helmCharts:
+  - name: base
+    repo: https://blob.istio.io/istio-release/charts
+    version: 1.31.1
+    releaseName: istio-base
+    namespace: istio-system
+    kubeVersion: "1.36.0"
+    includeCRDs: true
+    valuesInline:
+      defaultRevision: default
+      base:
+        # Required when applying rendered charts with server-side apply,
+        # otherwise the chart and istiod fight over failurePolicy.
+        validationFailurePolicy: Fail
